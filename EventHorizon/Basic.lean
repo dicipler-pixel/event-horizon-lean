@@ -212,6 +212,6 @@ theorem projector_norm_gap (c g : ℝ) (hg : 0 < g) :
   rw [← Real.sqrt_sq hg.le, ← Real.sqrt_mul (by positivity), Real.sqrt_sq hg.le]
   congr 1
   field_simp
-  ring
+  try ring
 
 end EventHorizon
