@@ -1,1 +1,1 @@
-{"modules":[{"module":"EventHorizon.Basic","path":"EventHorizon/Basic.lean"}],"expected_theorems":16,"expected_false_controls":3,"root_imports":["EventHorizon.Basic"]}
+{"modules":[{"module":"EventHorizon.Basic","path":"EventHorizon/Basic.lean"}],"expected_theorems":17,"expected_false_controls":3,"root_imports":["EventHorizon.Basic"]}

@@ -54,7 +54,7 @@ theorem shear_lift (wi wj : ℝ) (hi : 0 < wi) (hj : 0 < wj) :
   refine ⟨?_, ?_, ?_⟩
   · simp only [Hij, Hji]
     field_simp
-    rw [← sq, ← sq, hwi, hwj]
+    rw [hwi, hwj]
   · simp only [Hij, Hji]; ring
   · simp only [Hij, Hji, div_pow, mul_pow, hwi, hwj, h22]
     field_simp
@@ -118,35 +118,29 @@ theorem disc_det (w1 w2 w3 : ℝ) (hsum : w1 + w2 + w3 = 1) :
   subst this
   ring
 
+/-- A 2×2 quadratic form with nonnegative diagonal and nonnegative determinant is nonnegative. -/
+theorem psd2 (p q r x y : ℝ) (hp : 0 ≤ p) (hr : 0 ≤ r) (hd : q ^ 2 ≤ p * r) :
+    0 ≤ p * x ^ 2 - 2 * q * (x * y) + r * y ^ 2 := by
+  rcases hp.lt_or_eq with hp' | hp'
+  · have h : 0 ≤ p * (p * x ^ 2 - 2 * q * (x * y) + r * y ^ 2) := by
+      nlinarith [sq_nonneg (p * x - q * y), mul_nonneg (sub_nonneg.mpr hd) (sq_nonneg y)]
+    exact (mul_nonneg_iff_of_pos_left hp').mp h
+  · subst hp'
+    have hq : q = 0 := by nlinarith [sq_nonneg q]
+    subst hq
+    nlinarith [mul_nonneg hr (sq_nonneg y)]
+
 /-- **Theorem 2.3, reality.** On the shape simplex (`wᵢ ≥ 0`, `Σwᵢ = 1`) the discriminant of the
 transport block is nonnegative, so its spectrum is real on the entire regular stratum and
 exceptional points can only occur on the boundary strata. -/
 theorem spectrum_real (t1 t2 t3 w1 w2 w3 : ℝ) (h1 : 0 ≤ w1) (h2 : 0 ≤ w2) (h3 : 0 ≤ w3)
     (hsum : w1 + w2 + w3 = 1) : 0 ≤ disc (block t1 t2 t3 w1 w2 w3) := by
   rw [disc_form]
-  set S := t1 + t2 - 2 * t3
-  set a := t1 - t2
-  set p := (1 - w3) ^ 2
-  set q := (w1 - w2) * (1 + w3)
-  set r := (w1 - w2) ^ 2 + 4 * w3
-  have hp : 0 ≤ p := sq_nonneg _
-  have hdet : p * r - q ^ 2 = 16 * w1 * w2 * w3 := by
-    have := disc_det w1 w2 w3 hsum
-    simp only [p, q, r]; linarith
-  have hdet0 : 0 ≤ p * r - q ^ 2 := by rw [hdet]; positivity
-  have key : p * (p * S ^ 2 - 2 * q * (S * a) + r * a ^ 2) = (p * S - q * a) ^ 2 + (p * r - q ^ 2) * a ^ 2 := by
-    ring
-  rcases hp.lt_or_eq with hp' | hp'
-  · have : 0 ≤ p * (p * S ^ 2 - 2 * q * (S * a) + r * a ^ 2) := by
-      rw [key]; positivity
-    have h := nonneg_of_mul_nonneg_right (by linarith [this]) hp'
-    linarith [h, (mul_nonneg_iff_of_pos_left hp').mp this]
-  · have hq : q = 0 := by
-      have : q ^ 2 ≤ 0 := by rw [← hp'] at hdet0; linarith
-      exact pow_eq_zero_iff (n := 2) (by norm_num) |>.mp (le_antisymm this (sq_nonneg q))
-    rw [← hp', hq]
-    have hr : 0 ≤ r := by simp only [r]; positivity
-    nlinarith [sq_nonneg a]
+  have hdet := disc_det w1 w2 w3 hsum
+  have h16 : 0 ≤ 16 * w1 * w2 * w3 := by positivity
+  have := psd2 ((1 - w3) ^ 2) ((w1 - w2) * (1 + w3)) ((w1 - w2) ^ 2 + 4 * w3)
+    (t1 + t2 - 2 * t3) (t1 - t2) (sq_nonneg _) (by positivity) (by nlinarith)
+  nlinarith [this]
 
 /-- **Theorem 2.3, the wall is triangular.** At `w₃ = 0` the back-coupling `A₂₁` vanishes. -/
 theorem wall_triangular (t1 t2 t3 w1 w2 : ℝ) : block t1 t2 t3 w1 w2 0 1 0 = 0 := by
@@ -176,7 +170,9 @@ theorem wall_jordan (t1 t2 t3 w1 w2 : ℝ)
 diagonal, hence normal. -/
 theorem normal_if_T_isotropic (t w1 w2 w3 : ℝ) :
     block t t t w1 w2 w3 0 1 = 0 ∧ block t t t w1 w2 w3 1 0 = 0 := by
-  constructor <;> simp [block] <;> ring
+  constructor <;>
+    simp only [block, of_apply, cons_val', cons_val_zero, cons_val_one, empty_val',
+      cons_val_fin_one, head_cons, head_fin_const] <;> ring
 
 /-- **Non-normality needs both anisotropies: isotropic `W`.** With `w₁ = w₂ = w₃ = 1/3` the
 block is symmetric (`A₁₂ = A₂₁`), hence normal. -/
@@ -187,7 +183,10 @@ theorem normal_if_W_isotropic (t1 t2 t3 : ℝ) :
   have h3 : √3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
   have h3' : √3 ≠ 0 := sqrt3_ne
   field_simp
-  nlinarith [h3]
+  first
+  | linear_combination (-(t1 - t2)) * h3
+  | linear_combination (t1 - t2) * h3
+  | (rw [h3]; ring)
 
 /-! ## Sec. 4.2: the ledger at the Jordan point, and the snapped law -/
 
@@ -197,7 +196,7 @@ reference to eigenvectors. -/
 theorem ledger_at_jordan (lam c : ℝ) (hlam : 0 < lam) :
     Real.log (!![lam, c; 0, lam] : Matrix (Fin 2) (Fin 2) ℝ).det = 2 * Real.log lam := by
   rw [det_fin_two_of, show lam * lam - c * 0 = lam ^ 2 by ring, Real.log_pow]
-  norm_num
+  try norm_num
 
 /-- **The snapped law.** For the triangular block `[[λ, c], [0, λ+g]]` the rank-one projector
 onto the `λ` eigenline is `[[1, −c/g], [0, 0]]`; its Frobenius norm times the gap is
