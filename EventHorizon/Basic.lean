@@ -13,11 +13,12 @@ Jacobi matrix `X = diag(√wᵢ)`.
 * Eq. (2) and Theorem 2.3: the audited transport shape block; its discriminant is a quadratic
   form in `(t₁+t₂−2t₃, t₁−t₂)` with determinant exactly `16w₁w₂w₃ ≥ 0`, so the spectrum is real
   on the whole regular stratum; at `w₃ = 0` the block is triangular, and under the joint
-  condition `t₁+t₂−2t₃ = (t₁−t₂)(w₁−w₂)` it is a genuine size-2 Jordan block.
+  condition `t₁+t₂−2t₃ = (t₁−t₂)(w₁−w₂)` with `A₁₂ ≠ 0` it is a genuine size-2 Jordan block.
 * Sec. 2.1: non-normality needs both anisotropies (isotropic `T` or isotropic `W` gives a normal
   block).
-* Sec. 4.2: the contour ledger at the Jordan point is `2 log λ*` (determinant `λ*²`), and the
-  rank-one projector obeys `‖P₁‖ · gap = √(gap² + c²) → |c|` — the snapped law.
+* Sec. 4.2: the contour ledger at the Jordan point is `2 log λ*` (determinant `λ*²`), and, with
+  the rank-one projector's hand-computed Frobenius norm `√(1 + (c/gap)²)`,
+  `‖P₁‖ · gap = √(gap² + c²) → |c|` — the snapped law.
 -/
 import Mathlib
 
@@ -71,7 +72,8 @@ theorem wall_metric (w1 w2 w3 : ℝ) (h1 : w1 ≠ 0) (h2 : w2 ≠ 0) (h3 : w3 �
   field_simp
   ring
 
-/-- **Theorem 2.1, the limit.** `g(E₂,E₂) · 6w₃ → 1` as `w₃ → 0`. -/
+/-- **Theorem 2.1, the limit.** The closed form `1 + w₃(1/(4w₁) + 1/(4w₂))` of `g(E₂,E₂) · 6w₃`
+tends to `1` as `w₃ → 0`, with `w₁, w₂` fixed. -/
 theorem wall_metric_limit (w1 w2 : ℝ) :
     Tendsto (fun w3 => 1 + w3 * (1 / (4 * w1) + 1 / (4 * w2))) (𝓝 0) (𝓝 1) := by
   have h : Continuous fun w3 : ℝ => 1 + w3 * (1 / (4 * w1) + 1 / (4 * w2)) := by fun_prop
@@ -131,8 +133,8 @@ theorem psd2 (p q r x y : ℝ) (hp : 0 ≤ p) (hr : 0 ≤ r) (hd : q ^ 2 ≤ p *
     nlinarith [mul_nonneg hr (sq_nonneg y)]
 
 /-- **Theorem 2.3, reality.** On the shape simplex (`wᵢ ≥ 0`, `Σwᵢ = 1`) the discriminant of the
-transport block is nonnegative, so its spectrum is real on the entire regular stratum and
-exceptional points can only occur on the boundary strata. -/
+transport block is nonnegative, so its spectrum is real on the entire regular stratum. That
+exceptional points occur only on the boundary strata is not proved here. -/
 theorem spectrum_real (t1 t2 t3 w1 w2 w3 : ℝ) (h1 : 0 ≤ w1) (h2 : 0 ≤ w2) (h3 : 0 ≤ w3)
     (hsum : w1 + w2 + w3 = 1) : 0 ≤ disc (block t1 t2 t3 w1 w2 w3) := by
   rw [disc_form]
@@ -200,7 +202,8 @@ theorem ledger_at_jordan (lam c : ℝ) (hlam : 0 < lam) :
 
 /-- **The snapped law.** For the triangular block `[[λ, c], [0, λ+g]]` the rank-one projector
 onto the `λ` eigenline is `[[1, −c/g], [0, 0]]`; its Frobenius norm times the gap is
-`√(g² + c²)`, which tends to `|c|` as `g → 0`: the blow-up constant is the Jordan coupling. -/
+`√(g² + c²)`, which tends to `|c|` as `g → 0`: the blow-up constant is the Jordan coupling.
+The projector and its norm are computed by hand; this theorem is the limit. -/
 theorem snapped_law (c : ℝ) :
     Tendsto (fun g : ℝ => √(g ^ 2 + c ^ 2)) (𝓝 0) (𝓝 |c|) := by
   have h : Continuous fun g : ℝ => √(g ^ 2 + c ^ 2) := by fun_prop

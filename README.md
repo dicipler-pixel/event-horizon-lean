@@ -20,20 +20,21 @@ Jeromie Beasley
 
 Four-body shape space, with its own kinetic metric, is the Bures geometry of a qutrit's
 states. Its only genuine wall is the coplanar stratum `w₃ = 0`, and three things happen there at
-once: the metric blows up as `1/(6w₃)`, the transport operator becomes a Jordan block, and away
-from the wall its spectrum is provably real. What survives the collapse is contour data such as
+once: the metric blows up as `1/(6w₃)`, the transport block becomes triangular (a genuine Jordan
+block under a further joint condition with `A₁₂ ≠ 0`), and away from the wall its discriminant is provably
+nonnegative, so its spectrum is real. What survives the collapse is contour data such as
 the trace-log ledger.
 
 ## What is proved
 
 | Paper | Result | Theorem |
 | :--- | :--- | :--- |
-| Theorem 1 | The shape lift `hᵢ = eᵢ/(2√wᵢ)` gives `eᵢ²/(4wᵢ)`; the shear lift solves the lift equation, is horizontal, and has squared norm `1/(2(wᵢ+wⱼ))` (Bures weights) | `shape_lift`, `shear_lift`, `shear_values` |
-| Theorem 2.1 | `g(E₂,E₂)·6w₃ = 1 + w₃(1/(4w₁) + 1/(4w₂)) → 1`: the metric blows up exactly as `1/(6w₃)` | `wall_metric`, `wall_metric_limit` |
+| Theorem 1 | The shape lift `hᵢ = eᵢ/(2√wᵢ)` gives `eᵢ²/(4wᵢ)`; the shear lift solves the lift equation, is horizontal, and has squared norm `1/(2(wᵢ+wⱼ))` (Bures weights), with numerical values at `w = (0.5, 0.3, 0.2)` | `shape_lift`, `shear_lift`, `shear_values` |
+| Theorem 2.1 | `g(E₂,E₂)·6w₃ = 1 + w₃(1/(4w₁) + 1/(4w₂))`, and this closed form tends to `1` as `w₃ → 0` with `w₁, w₂` fixed: the metric blows up as `1/(6w₃)` | `wall_metric`, `wall_metric_limit` |
 | Theorem 2.3 | The discriminant of the transport block is a quadratic form whose determinant is exactly `16w₁w₂w₃`, so it is nonnegative and the spectrum is real on the whole regular stratum | `disc_form`, `disc_det`, `psd2`, `spectrum_real` |
-| Theorem 2.3 | At `w₃ = 0` the block is triangular; under `t₁+t₂−2t₃ = (t₁−t₂)(w₁−w₂)` it is a genuine size-2 Jordan block | `wall_triangular`, `wall_jordan` |
+| Theorem 2.3 | At `w₃ = 0` the block is triangular; under `t₁+t₂−2t₃ = (t₁−t₂)(w₁−w₂)` its diagonal entries coincide at `λ* = 2t₃` and `(A − λ*)² = 0`, and if moreover `A₁₂ ≠ 0` it is a genuine size-2 Jordan block | `wall_triangular`, `wall_jordan` |
 | Sec. 2.1 | Non-normality needs both anisotropies: isotropic `T` or isotropic `W` gives a normal block | `normal_if_T_isotropic`, `normal_if_W_isotropic` |
-| Sec. 4.2 | The ledger at the Jordan point is `2 log λ*`; the rank-one projector obeys `‖P₁‖·gap = √(gap² + c²) → |c|` | `ledger_at_jordan`, `projector_norm_gap`, `snapped_law` |
+| Sec. 4.2 | The ledger at the Jordan point is `2 log λ*`; with the rank-one projector's Frobenius norm `√(1 + (c/g)²)` computed by hand, `‖P₁‖·g = √(g² + c²) → \|c\|` as `g → 0` | `ledger_at_jordan`, `projector_norm_gap`, `snapped_law` |
 
 The file is [`EventHorizon/Basic.lean`](EventHorizon/Basic.lean). What is not proved is in
 [`LIMITATIONS.md`](LIMITATIONS.md).
