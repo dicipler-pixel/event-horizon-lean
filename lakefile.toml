@@ -9,4 +9,4 @@ rev = "v4.34.1"
 
 [[lean_lib]]
 name = "EventHorizon"
-roots = ["EventHorizon.Basic"]
+roots = ["EventHorizon.Basic", "EventHorizon.Edition10"]
